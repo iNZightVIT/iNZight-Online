@@ -1,0 +1,13 @@
+
+# state.R functions
+
+################################################################################
+# functions to set initial values and take information from state_list
+# when available
+################################################################################
+
+state_singlevar
+state_multvar
+state_init
+state_init_list
+state_init_multvar

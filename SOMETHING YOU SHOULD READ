@@ -1,0 +1,35 @@
+Here is something you should read:
+
+1. observer
+2. reactive
+3. renderUI
+4. validate
+
+*** observer and reactive
+There are lots of examples here can help you understand them.
+They are the soul in shiny framework.
+
+*** renderUI
+There is lots of examples of this.
+A key principal of this you need to compare to its brother: conditionalPanel
+There are so much different in logical statement between Javascript and R.
+I would strongly suggest to use R syntax.
+Though, conditional panel can give you extra benefit in UI because it will never
+create the element once its false. 
+renderUI does not. You should check this. 
+
+Details from the link: http://shiny.rstudio.com/articles/dynamic-ui.html
+
+conditionalPanel creates a panel that shows and hides its contents depending on 
+the value of a JavaScript expression
+
+The most benefit for me to just use renderUI is that it providing you a way to write
+into server.R because in many case you need to get server response to decide show/hide.
+
+
+*** validate
+I can give some validate example:
+~/tools/basic/observer.R --- paramS <- reactive({...})
+~/tools/data/transform.R --- not_number/not_character functions.
+
+
