@@ -10,4 +10,4 @@ Depends: R (>= 3.1.0)
 Imports: Shiny
 Suggests: iNZight
 Description: Shiny App for iNZight VIT 
-License: GPL-2
+License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
