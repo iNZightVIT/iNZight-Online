@@ -1,0 +1,13 @@
+Package: iNZightOnline
+Type: Shiny App
+Title: iNZight-Online
+Version: 1.0
+Date: 2014-09-19
+Authors@R: c(person("Junjie", "Zeng", role = c("aut", "cre"),
+              email = "jzen188@aucklanduni.ac.nz")
+             )
+Depends: R (>= 3.1.0)
+Imports: Shiny
+Suggests: iNZight
+Description: Shiny App for iNZight VIT 
+License: GPL-2
