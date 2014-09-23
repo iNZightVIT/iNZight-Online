@@ -589,7 +589,8 @@ output$sumadd <- renderPrint({
   if (is.null(optpar2$x))
     return(cat("Variable 1 have to be selected"))
   
-    cat(do.call(iNZightPlots:::getPlotSummary, reactiveValuesToList(optpar2)), sep = "\n")
+  List <- modifyList(reactiveValuesToList(optpar2), reactiveValuesToList(optpar3))
+    cat(do.call(iNZightPlots:::getPlotSummary, List), sep = "\n")
   
 })
 
