@@ -49,7 +49,11 @@ output$basicdefine <- renderUI({
                                                      condition = "input.B !=' '",
                                                      uiOutput('sb2_sl')))                                      
                                           ),
-                                          actionButton("redefault", "Clear All!"),
+                                          span(
+                                            actionButton("redefault", "Clear All!"),
+                                            radioButtons("defaultStyle", "Change to defaultStyle!", 
+                                                         c("Small","Large"), inline=TRUE)
+                                          ),
                                           tags$br(),
                                           fixedRow(
                                             ## input a big white pic here.

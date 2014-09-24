@@ -331,6 +331,8 @@ output$atc.ui <- renderUI({
         sliderInput('pn.sl', "Smoother control", min = 0.1, 
                     max = 1, value = cur.value, step = 0.1),
         
+        checkboxInput('qs.cb', "Use quantile", value = FALSE),
+        
         checkboxInput('tb.cb', "for each level", value = optpar3$trend.by)
       )
     }

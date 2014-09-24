@@ -312,7 +312,7 @@ optpar3 <- reactiveValues(col.pt         = "grey50",  #
                           rugs           = "", #
                           trend          = NULL, #
                           smooth         = 0,  #
-                          quant.smooth   = NULL,
+                          quant.smooth   = NULL,  # "default" / NULL
                           LOE            = FALSE, #
                           join           = FALSE, #
                           lines.by       = FALSE,  #
@@ -324,8 +324,9 @@ optpar3 <- reactiveValues(col.pt         = "grey50",  #
                           col.LOE        = "black", #
                           inference.type = NULL, #
                           bs.inference   = FALSE,#
-                          szsym = as.numeric(1), #
-                          tpsym = as.numeric(1) #
+                          largesample    = FALSE,
+                          szsym          = as.numeric(1), #
+                          tpsym          = as.numeric(1) #
 )
 
 # we need a option parameter to storage our previous selection
@@ -414,16 +415,21 @@ observe({
                    cubic = input$tc.p3)
   colsmooth <- ifelse(input$tc.pn != " ", input$tc.pn, " ")
   smoo <- NULL 
-  if(colsmooth != " ") 
+  quantial.s <- NULL
+  if(colsmooth != " " ) {
     smoo <- input$pn.sl
+  }
   
+  if(colsmooth != " " & input$qs.cb) {
+    quantial.s <- "default"
+  }
   
   optpar3$trend = addtrend
   optpar3$smooth = smoo
   optpar3$trend.by = input$tb.cb
   optpar3$col.trend = coltrend
   optpar3$col.smooth = colsmooth
-  
+  optpar3$quant.smooth = quantial.s
   
   
 })
@@ -623,4 +629,16 @@ observe({
   updateSelectInput(session, "B", selected = " ")
   
   
+})
+
+observe({
+  
+  input$defaultStyle
+  
+  if (!is.null(input$defaultStyle) && input$defaultStyle == "Large") {
+    optpar3$largesample <- TRUE
+  }
+  else {
+    optpar3$largesample <- FALSE
+  }
 })
