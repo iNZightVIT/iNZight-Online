@@ -272,8 +272,9 @@ loadUserData <- function(filename, uFile, ext) {
     if (input$rowNames) 
       rowNames <- 1
     
-    values[[objname]] <- read.csv(uFile, header=input$header, 
-                                                          sep=input$sep, row.names = rowNames)
+    values[[objname]] <- read.csv(uFile, header=input$header, comment.char = "#",
+                                  sep=input$sep, row.names = rowNames,
+                                  na.strings=c("NA","NULL"))
   }
 }
 
