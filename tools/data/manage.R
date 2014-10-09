@@ -11,16 +11,21 @@ output$ui_Manage <- renderUI({
         #".rda" = "rda", 
         ".csv" = "csv",                                              
         #"clipboard" = "clipboard", 
-        "examples" = "examples"), 
+        "examples" = "examples",
+        "URL" = "URL"), 
         inline=TRUE,
         selected = "csv"),
-      conditionalPanel(condition = "input.dataType != 'clipboard' && input.dataType != 'examples'",
-        conditionalPanel(condition = "input.dataType == 'csv'",
-          checkboxInput('header', 'Header', TRUE),
-          checkboxInput('rowNames', 'First column as row names', FALSE),
-          radioButtons('sep', '', c(Comma=',', Semicolon=';', Tab='\t'), ',')
-        ),
+      conditionalPanel(condition = "input.dataType != 'URL' && input.dataType != 'examples'",
+        checkboxInput('header', 'Header', TRUE),
+        checkboxInput('rowNames', 'First column as row names', FALSE),
+        radioButtons('sep', '', c(Comma=',', Semicolon=';', Tab='\t'), ','),
         fileInput('uploadfile', '', multiple=TRUE)
+      ),
+      conditionalPanel(condition = "input.dataType != 'csv' && input.dataType != 'examples'",
+        textInput("URL_input", "Paste in data set URL", ""),
+        checkboxInput('header', 'Header', TRUE),
+        checkboxInput('rowNames', 'First column as row names', FALSE),
+        radioButtons('sep', '', c(Comma=',', Semicolon=';', Tab='\t'), ',')
       ),
       conditionalPanel(condition = "input.dataType == 'clipboard'",
         actionButton('loadClipData', 'Paste data')
@@ -32,9 +37,11 @@ output$ui_Manage <- renderUI({
     wellPanel(
       radioButtons(inputId = "saveAs", label = "Save data:", 
                    c(
-                     ".rda" = "rda", 
+                     #".rda" = "rda", 
                      ".csv" = "csv", 
-                     "copy to clipboard" = "clipboard"), 
+                     ".txt" = "tab"
+                     #"copy to clipboard" = "clipboard"
+                     ), 
         selected = "csv"),
       checkboxInput("man_add_descr","Add/edit data description", FALSE),
       conditionalPanel(condition = "input.man_add_descr == true",
@@ -191,6 +198,18 @@ observe({
   }
 })
 
+observe({
+  #if(input$URL_input=="") return()
+  url = input$URL_input
+  isolate({
+    if(!is.null(input$URL_input)){
+      if(url!=""){
+        loadUserData(basename(url),url,"URL")  
+      }
+    }
+  })
+})
+
 # loading all examples files (linked to helpfiles)
 observe({
   if(is.null(input$loadExampleData) || input$loadExampleData == 0) return()
@@ -235,11 +254,12 @@ observe({
 # })
 
 loadUserData <- function(filename, uFile, ext) {
-
   # ext <- file_ext(filename)
   # filename <- "test.rda"
   # ext <- 'rda'
-  objname <- sub(paste(".",ext,sep = ""),"",basename(filename))
+  ext2 = strsplit(filename,".",fixed=T)[[1]]
+  objname <- sub(paste(".",ext2[length(ext2)],sep = ""),"",basename(filename))
+  message(paste("ext=XXX",objname,"XXX",sep=""))
   # ext <- tolower(ext)
 
   # if(ext == 'rda' || ext == 'rdata') {
@@ -255,15 +275,7 @@ loadUserData <- function(filename, uFile, ext) {
       values[[objname]] <- as.data.frame(get(robjname))
       values[[paste0(objname,"_descr")]] <- attr(values[[objname]], "description")
     }
-  }
-
-  if(length(values[['datasetlist']]) == 0 || values[['datasetlist']][1] == '') {
-    values[['datasetlist']] <- c(objname)
-  } else {
-    values[['datasetlist']] <- unique(c(objname,values[['datasetlist']]))
-  }
-
-  if(ext == 'sav') {
+  } else if(ext == 'sav') {
     values[[objname]] <- as.data.frame(as.data.set(spss.system.file(uFile)))
   } else if(ext == 'dta') {
     values[[objname]] <- read.dta(uFile)
@@ -273,8 +285,37 @@ loadUserData <- function(filename, uFile, ext) {
       rowNames <- 1
     
     values[[objname]] <- read.csv(uFile, header=input$header, comment.char = "#",
-                                  sep=input$sep, row.names = rowNames,
+                                  sep=input$sep, row.names = rowNames, quote = "",
                                   na.strings=c("NA","NULL"))
+  }else if(ext == 'URL'){
+    rowNames <- NULL
+    if (input$rowNames) 
+      rowNames <- 1
+    tryCatch({
+      values[[objname]] <- read.table(uFile, header=input$header, comment.char = "#",
+                                    sep=input$sep, row.names = rowNames, quote = "",
+                                    na.strings=c("NA","NULL"))
+    },
+    error=function(cond) {
+      message(paste("URL does not seem to exist:", uFile))
+      message("Here's the original error message:")
+      message(cond)
+    },
+    warning=function(cond) {
+      message(paste("URL caused a warning:", uFile))
+      message("Here's the original warning message:")
+      message(cond)
+    },
+    finally={
+      message(paste("Processed URL:", uFile))
+    })
+  }
+  if(objname!=""&objname%in%names(values)){
+    if(length(values[['datasetlist']]) == 0 || values[['datasetlist']][1] == '') {
+      values[['datasetlist']] <- c(objname)
+    } else {
+      values[['datasetlist']] <- unique(c(objname,values[['datasetlist']]))
+    }
   }
 }
 
