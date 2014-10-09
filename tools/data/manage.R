@@ -37,10 +37,10 @@ output$ui_Manage <- renderUI({
     wellPanel(
       radioButtons(inputId = "saveAs", label = "Save data:", 
                    c(
-                     #".rda" = "rda", 
+                     ".rda" = "rda", 
                      ".csv" = "csv", 
-                     ".txt" = "tab"
-                     #"copy to clipboard" = "clipboard"
+                     #".txt" = "tab"
+                     "copy to clipboard" = "clipboard"
                      ), 
         selected = "csv"),
       checkboxInput("man_add_descr","Add/edit data description", FALSE),
