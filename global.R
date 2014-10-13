@@ -1,4 +1,4 @@
- #only write if running on developer computer
+#only write if running on developer computer
 #if(file.exists("./radiant")) {
    #list of all radiant files with time-stamps
    #dbox_remote <- file.info(list.files(recursive = TRUE, include.dirs = TRUE))

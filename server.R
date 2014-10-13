@@ -8,16 +8,11 @@ library(devtools)
 library(iNZightRegression)
 
 # Globally define a place where all users can share some reactive data. # not too much used in this case
-vars <- reactiveValues(users=NULL)
-
-
+vars <- reactiveValues(users=NULL,actionCounter=0)
 
 shinyServer(function(input, output, session) {
   
   source('internal.R', local = TRUE)
-  
-  
-  
   source('tools/home/home.R', local = TRUE)
   source('tools/data/data_ui_and_tabs.R', local = TRUE)
   source('tools/data/filter.R', local = TRUE)

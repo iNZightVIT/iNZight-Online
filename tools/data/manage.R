@@ -22,10 +22,11 @@ output$ui_Manage <- renderUI({
         fileInput('uploadfile', '', multiple=TRUE)
       ),
       conditionalPanel(condition = "input.dataType != 'csv' && input.dataType != 'examples'",
-        textInput("URL_input", "Paste in data set URL", ""),
+        textInput("URL_input", "Paste in data set URL and press the Submit URL button below.", ""),
         checkboxInput('header', 'Header', TRUE),
         checkboxInput('rowNames', 'First column as row names', FALSE),
-        radioButtons('sep', '', c(Comma=',', Semicolon=';', Tab='\t'), ',')
+        radioButtons('sep', '', c(Comma=',', Semicolon=';', Tab='\t'), ','),
+        actionButton("submit_URL","Submit URL")
       ),
       conditionalPanel(condition = "input.dataType == 'clipboard'",
         actionButton('loadClipData', 'Paste data')
@@ -201,13 +202,20 @@ observe({
 observe({
   #if(input$URL_input=="") return()
   url = input$URL_input
-  isolate({
-    if(!is.null(input$URL_input)){
-      if(url!=""){
-        loadUserData(basename(url),url,"URL")  
-      }
+  if(!is.null(input$submit_URL)){
+    if(input$submit_URL>vars$actionCounter&url!=""){
+      message("before")
+      message(vars$actionCounter)
+      message(input$submit_URL>vars$actionCounter)
+      message(input$submit_URL)
+      message("after")
+      vars$actionCounter=input$submit_URL
+      message(vars$actionCounter)
+      message(input$submit_URL>vars$actionCounter)
+      message(input$submit_URL)
+      isolate({loadUserData(basename(url),url,"URL") })
     }
-  })
+  }
 })
 
 # loading all examples files (linked to helpfiles)
@@ -259,7 +267,7 @@ loadUserData <- function(filename, uFile, ext) {
   # ext <- 'rda'
   ext2 = strsplit(filename,".",fixed=T)[[1]]
   objname <- sub(paste(".",ext2[length(ext2)],sep = ""),"",basename(filename))
-  message(paste("ext=XXX",objname,"XXX",sep=""))
+  # message(paste("ext=XXX",objname,"XXX",sep=""))
   # ext <- tolower(ext)
 
   # if(ext == 'rda' || ext == 'rdata') {
@@ -299,7 +307,7 @@ loadUserData <- function(filename, uFile, ext) {
     error=function(cond) {
       message(paste("URL does not seem to exist:", uFile))
       message("Here's the original error message:")
-      message(cond)
+      #message(cond)
     },
     warning=function(cond) {
       message(paste("URL caused a warning:", uFile))
