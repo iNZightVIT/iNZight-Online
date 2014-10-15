@@ -20,7 +20,7 @@ output$home_side_and_main <- renderUI({
         includeHTML('tools/home/HTMLobjects.Rhtml'),
         #a(href="https://www.stat.auckland.ac.nz/~wild/iNZight/",
         #  img(src="https://www.stat.auckland.ac.nz/~wild/iNZight/images/iNZhead.png",alt="iNZight",style="align:right")),
-        p(style="color:red", "iNZight-Online V 1.0")
+        p(style="color:red", "iNZight-Online V 0.1.0")
         #p(),
         #verbatimTextOutput('global.num')
         #a(href="https://www.stat.auckland.ac.nz/~wild/VIT/index.html",
