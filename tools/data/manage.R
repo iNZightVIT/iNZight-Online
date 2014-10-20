@@ -199,20 +199,25 @@ observe({
   }
 })
 
+# This was the suggested solution to the observer below
+# from https://github.com/rstudio/shiny/issues/167
+# not sure what I'm doing wrong, for now I leave my solution.
+# url <- reactive({
+#   eventFilter(input$submit_URL, input$URL_input)
+# })
+# 
+# observeEvent(input$submit_URL, function() {
+#   isolate({loadUserData(basename(url),url,"URL") })
+# })
+
+# Data import
+# observes whether URL input is provided
 observe({
   #if(input$URL_input=="") return()
   url = input$URL_input
   if(!is.null(input$submit_URL)){
     if(input$submit_URL>vars$actionCounter&url!=""){
-      message("before")
-      message(vars$actionCounter)
-      message(input$submit_URL>vars$actionCounter)
-      message(input$submit_URL)
-      message("after")
       vars$actionCounter=input$submit_URL
-      message(vars$actionCounter)
-      message(input$submit_URL>vars$actionCounter)
-      message(input$submit_URL)
       isolate({loadUserData(basename(url),url,"URL") })
     }
   }

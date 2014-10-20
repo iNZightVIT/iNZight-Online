@@ -1,7 +1,8 @@
 library(shiny)
 
 shinyUI(
-  navbarPage("iNZight", id = "nav_radiant", collapsable = TRUE,
+  navbarPage(HTML("<a href='/futurelearn2014/'>iNZight online</a>"),
+             id = "nav_radiant", collapsable = TRUE,
              tabPanel("Data", uiOutput('data_ui_and_tabs')),
              tabPanel("Basic", uiOutput("basicdefine")),           
              tabPanel("TimeSeries", uiOutput('timeseries_ui')),
