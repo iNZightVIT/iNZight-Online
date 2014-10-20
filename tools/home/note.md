@@ -2,11 +2,8 @@ iNZight Online
 ========================================================
 
 the online version of the iNZight data analysis system (https://www.stat.auckland.ac.nz/~wild/iNZight/ ),
+initially written by Junjie Zeng, and currently being maintained by Christoph Knapp, 
+for Chris Wild (<a href="mailto:c.wild@auckland.ac.nz">c.wild@auckland.ac.nz</a>),
+at the University of Auckland, New Zealand.
 
-is currently being developed by Junjie Zeng  for Chris Wild(c.wild@auckland.ac.nz). 
-
-
-
-
-
-
+Basic instructions can be found <a href="https://www.stat.auckland.ac.nz/~wild/iNZight/online.html" target="_blank">on the iNZight website</a>.
