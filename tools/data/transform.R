@@ -42,8 +42,8 @@ output$uiTr_columns <- renderUI({
 
 output$uiTr_reorder_levs <- renderUI({
 	# if(is.null(input$tr_columns)) return()
-	isFct <- "factor" == getdata_class()[input$tr_columns[1]]
-  if(!is.null(Fct) && !isFct) return()
+	isFct <- "cat"%in%getdata_class()[input$tr_columns[1]]
+  if(is.null(input$tr_columns)|!isFct) return()
   dat <- getdata()
   returnOrder("tr_reorder_levs", levels(dat[,input$tr_columns[1]]))	
 })
@@ -312,8 +312,12 @@ transform_main <- reactive({
 
 	if(!is.null(input$tr_columns) & input$tr_changeType == 'reorder_levs') {
     if(!is.null(input$tr_reorder_levs)) {
-    	isFct <- "factor" == getdata_class()[input$tr_columns[1]]
-		  if(isFct) dat[,input$tr_columns[1]] <- factor(dat[,input$tr_columns[1]], levels = input$tr_reorder_levs)
+    	isFct <- "cat" == getdata_class()[input$tr_columns[1]]
+		  if(isFct){
+		    print(input$tr_reorder_levs)
+        dat[,input$tr_columns[1]] <- factor(dat[,input$tr_columns[1]], levels = input$tr_reorder_levs)
+        print(levels(dat[,input$tr_columns[1]]))
+		  }
     }
   }
 
@@ -421,7 +425,7 @@ transform_main <- reactive({
 })
 
 output$transform_data <- reactive({
-  
+  print("transform_data")
 	dat <- transform_main()
 	if(is.null(dat)) return(invisible())
 	if(is.character(dat)) return(dat)
@@ -540,14 +544,12 @@ output$BlankSpace <- renderPlot({
 
 
 observe({
-  
   if (!is.null(input$tr_changeType)){
-  if (input$tr_changeType %in% c("recode","rename", "reorder_levs")) {
-    
-    reactiveMulti$is <- FALSE
-  }
-  else
-    reactiveMulti$is <- TRUE
-  
+    if (input$tr_changeType %in% c("recode","rename", "reorder_levs")) {
+      message("in observe")
+      reactiveMulti$is <- FALSE
+    }else{
+      reactiveMulti$is <- TRUE
+    }
   }
 })
