@@ -1,14 +1,12 @@
-#sourceVar{
-  /* id = sourceVar is now changing its css properties. */
-  width: 200px;
-  height: 250px;
-  overflow:scroll;
+#sourceVar {
+	/* id = sourceVar is now changing its css properties. */
+	width: 200px;
+	height: 250px;
+	overflow: scroll;
 }
 
-#comPlot_modal{
-  
-  
-  width: 500px;
-  height: 500px;
-  overflow:scroll;
+#comPlot_modal {
+	width: 500px;
+	height: 500px;
+	overflow: scroll;
 }

@@ -314,9 +314,7 @@ transform_main <- reactive({
     if(!is.null(input$tr_reorder_levs)) {
     	isFct <- "cat" == getdata_class()[input$tr_columns[1]]
 		  if(isFct){
-		    print(input$tr_reorder_levs)
         dat[,input$tr_columns[1]] <- factor(dat[,input$tr_columns[1]], levels = input$tr_reorder_levs)
-        print(levels(dat[,input$tr_columns[1]]))
 		  }
     }
   }
@@ -425,7 +423,6 @@ transform_main <- reactive({
 })
 
 output$transform_data <- reactive({
-  print("transform_data")
 	dat <- transform_main()
 	if(is.null(dat)) return(invisible())
 	if(is.character(dat)) return(dat)
@@ -546,7 +543,6 @@ output$BlankSpace <- renderPlot({
 observe({
   if (!is.null(input$tr_changeType)){
     if (input$tr_changeType %in% c("recode","rename", "reorder_levs")) {
-      message("in observe")
       reactiveMulti$is <- FALSE
     }else{
       reactiveMulti$is <- TRUE

@@ -174,7 +174,7 @@ addResourcePath("figures", "tools/help/figures/")
 helpModal <- function(title, link, content) {
   ## title: popup window head title
   ## link: HTML id attribution
-  ## cotent: things inside
+  ## content: things inside
   
   html <- sprintf("<div id='%s' class='modal hide fade in' style='display: none; '>
                      <div class='modal-header'><a class='close' data-dismiss='modal' href='#'>&times;</a>
