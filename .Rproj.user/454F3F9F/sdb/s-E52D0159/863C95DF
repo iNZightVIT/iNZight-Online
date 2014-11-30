@@ -1,0 +1,16 @@
+{
+    "contents" : "library(shiny)\n\nshinyUI(\n  navbarPage(\"iNZight\", id = \"nav_radiant\", collapsable = TRUE,\n             tabPanel(\"Data\", uiOutput('data_ui_and_tabs')),\n             tabPanel(\"Basic\", uiOutput(\"basicdefine\")),           \n             tabPanel(\"TimeSeries\", uiOutput('timeseries_ui')),\n             tabPanel(\"Quick Explore\", uiOutput('view_ui_and_tabs')),\n             tabPanel(\"Model\", uiOutput('ui_model')),\n             tabPanel(\"Home\", uiOutput('home_side_and_main'))\n  )\n)",
+    "created" : 1412721835151.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1367460220",
+    "id" : "863C95DF",
+    "lastKnownWriteTime" : 1411521638,
+    "path" : "~/git/iNZight-Online/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

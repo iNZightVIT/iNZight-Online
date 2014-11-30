@@ -1,0 +1,16 @@
+{
+    "contents" : "library(shiny)\nlibrary(stringr)\nlibrary(grid)\nlibrary(iNZightTS)\nlibrary(iNZightPlots)\nlibrary(gpairs)\nlibrary(devtools)\nlibrary(iNZightRegression)\n\n# Globally define a place where all users can share some reactive data. # not too much used in this case\nvars <- reactiveValues(users=NULL)\n\n\n\nshinyServer(function(input, output, session) {\n  \n  source('internal.R', local = TRUE)\n  \n  \n  \n  source('tools/home/home.R', local = TRUE)\n  source('tools/data/data_ui_and_tabs.R', local = TRUE)\n  source('tools/data/filter.R', local = TRUE)\n  source('tools/data/manage.R', local = TRUE)\n  source('tools/data/multisort.R', local = TRUE)\n  source('tools/data/transform.R', local = TRUE)\n  #source('tools/app/report.R', local = TRUE)\n  #source('tools/app/state.R', local = TRUE)\n  source('tools/basic/basic.R', local = TRUE)\n  source('tools/basic/basic_ui.R', local = TRUE)\n  source('tools/basic/observer.R', local = TRUE)\n  source('tools/timeseries/timeseries.R', local = TRUE)\n  source('tools/timeseries/ts1.R', local = TRUE)\n  source('tools/quick explore/view.R', local = TRUE)\n  source('tools/Model/model_ui.R', local = TRUE)\n  source('tools/Model/chooser.R', local = TRUE)\n  source('tools/Model/functionalityTool.R', local = TRUE)\n  source('tools/Model/menu.R', local = TRUE)\n  source('tools/Model/modalTool.R', local = TRUE)\n  source('tools/Model/model_observe.R', local = TRUE)\n  \n  \n  # source data & analysis tools\n  # from R3.0.2, R.utils::sourceDirectory NOT WORK\n  # it was used for recursive load the script into the environment\n  #R.utils::sourceDirectory('tools/analysis', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/chatroom', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/data', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/app', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/home', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/basic', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/timeseries', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/explore', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/client', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/view', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/Model', recursive = TRUE)\n  #R.utils::sourceDirectory('tools/Filter', recursive = TRUE)\n  # R.utils::sourceDirectory('../base/tools/data', recursive = TRUE)\n  # R.utils::sourceDirectory('../base/tools/app', recursive = TRUE)\n  \n  output$plot33 <- renderPlot({\n    progress <- shiny::Progress$new(session, min=1, max=15)\n    on.exit(progress$close())\n    \n    progress$set(message = 'Calculation in progress',\n                 detail = 'This may take a while...')\n    \n    for (i in 1:15) {\n      progress$set(value = i)\n      Sys.sleep(0.5)\n    }\n    plot(cars)\n  })\n  \n})",
+    "created" : 1412721833487.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2478139992",
+    "id" : "FFC92E67",
+    "lastKnownWriteTime" : 1412718752,
+    "path" : "~/git/iNZight-Online/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
