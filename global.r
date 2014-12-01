@@ -391,6 +391,11 @@ load.data = function(fileID=NULL,path=NULL){
   }
 }
 
+# returns directories in the data directory
+get.data.dirs = function(){
+  list.files("data",include.dirs=T,full.names=T)[file.info(paste("data",list.files("data"),sep="/"))[,"isdir"]]
+}
+
 # returns a radioButton widget, for every filename in the dir.lable directory.
 get.radio.list = function(dir.label,idlabel){
   files = c()
@@ -423,12 +428,13 @@ change.file.ext = function(name,new.ext){
 }
 
 # get the data, could also be NULL as the function returns NULL if called like that
+
 first.reorder=T
 transform.text = ""
 data = load.data()
 data.name = data[[1]]
 data = data[[2]]
-temp.data=NULL
-imported=F
+temp.data=""
+loaded = F
 
 

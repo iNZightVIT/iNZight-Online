@@ -2,12 +2,6 @@ help.switch = function(){
   helpModal('Switch data','switch_data',inclMD("gui-elements/notes/switch.data.md"))
 }
 
-# returns all files and directories in the data directory
-# and tests whether it is a directory, files are removed. 
-get.data.dirs = function(){
-  list.files("data",include.dirs=T,full.names=T)[file.info(paste("data",list.files("data"),sep="/"))[,"isdir"]]
-}
-
 # puts together a list of shiny widgets to fill the sidebar
 get.sidebar.switch = function(data.select){
   choices1=get.data.dirs()

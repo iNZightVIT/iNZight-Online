@@ -19,7 +19,7 @@ shinyUI(
                           tabPanel("Transform columns",uiOutput('transform.columns')),
                           tabPanel("Reorder Levels",uiOutput('reorder.levels')),
                           tabPanel("Compare dates"),
-                          tabPanel("Add columns"),
+                          tabPanel("Add columns",uiOutput("add.columns")),
                           tabPanel("Remove columns")
                           ),
                navbarMenu("Quick Plots",
