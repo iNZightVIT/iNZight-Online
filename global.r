@@ -24,6 +24,26 @@ change.sign.transform = function(data,names){
   temp
 }
 
+test.for.dates = function(){
+  ret = F
+  if(!is.null(data)){
+    ret = unlist(lapply(
+      1:ncol(data),function(index,data){
+      tryCatch({
+        is.numeric(as.numeric(as.Date(data[,index], origin = "1900-01-01")))
+      },
+      error=function(cond) {
+        ret = F
+      },
+      warning=function(cond) {
+        print(cond)
+      },
+      finally={})
+    },data))
+  }
+  ret
+}
+
 copy.transform = function(data,names){
   data = as.data.frame(data)
   colnames(data) = paste("copy",names,sep=".")
@@ -334,7 +354,6 @@ helpModal <- function(title, link, content) {
   ## title: popup window head title
   ## link: HTML id attribution
   ## cotent: things inside
-  
   html <- sprintf("<div id='%s' class='modal hide fade in' style='display: none; '>
                      <div class='modal-header'><a class='close' data-dismiss='modal' href='#'>&times;</a>
                        <h3>%s</h3>
@@ -342,7 +361,7 @@ helpModal <- function(title, link, content) {
                      <div class='modal-body'>%s</div>
                    </div>
                    <a title='Help' data-toggle='modal' href='#%s' class='icon-question-sign'>
-                      <img src=\"images/question.png\" alt=\"HTML tutorial\" style=\"width:34px;height:24px;border:0\">
+                      <img src=\"images/question.png\" alt=\"HTML tutorial\" style=\"width:16px;height:16px;border:0\">
                    </a>", link, title, content, link)
   Encoding(html) <- 'UTF-8'
   HTML(html)

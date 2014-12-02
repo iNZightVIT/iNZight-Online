@@ -21,7 +21,9 @@ shinyServer(function(input, output, session) {
   source("gui-elements/remove.data.panel.R",local=T)
   source("gui-elements/transform.columns.panel.R",local=T)
   source("gui-elements/reorder.levels.panel.R",local=T)
+  source("gui-elements/compare.dates.panel.R",local=T)
   source("gui-elements/add.columns.panel.R",local=T)
+  source("gui-elements/remove.columns.panel.R",local=T)
   
   ################################################################################
   #
@@ -103,7 +105,6 @@ shinyServer(function(input, output, session) {
   output$load.data.panel = renderUI({
     input$selector
     input$import_set
-    print(loaded)
     if(loaded&&!is.null(input$import_set)&&input$import_set==1){
       loaded <<- F
       if(!file.exists("data/Imported")){
@@ -117,7 +118,6 @@ shinyServer(function(input, output, session) {
   
   output$filetable <- renderDataTable({
     input$selector
-    print("renderTable")
     if (is.null(input$files)) {
       # User has not uploaded a file yet
       return(NULL)
@@ -336,7 +336,109 @@ shinyServer(function(input, output, session) {
   })
 
   output$reorder.levels =renderUI({
-    reorder.levels.panel(choices,selected)
+    reorder.levels.panel()
+  })
+  
+  ################################################################################
+  
+  ################################################################################
+  #
+  # modify -> compare dates : reorder the levels of a column of factors
+  #
+  ################################################################################
+  
+  observe({
+    input$compare_dates
+    if(!is.null(data)&&!is.null(input$compare_dates)&&input$compare_dates>0){
+      isolate({
+        columns = input$sel.compare.dates[1:2]
+        if(!is.null(columns)&&columns[1]!=""){
+          temp.col = NULL
+          for(col in 1:length(columns)){
+            if(col==1){
+              tryCatch({
+                temp.col = as.numeric(as.Date(data[,columns[col]], origin = "1900-01-01"))
+              },
+              error=function(cond) {
+                temp.col = NULL
+              },
+              warning=function(cond) {
+                print(cond)
+              },
+              finally={})
+            }else{
+              tryCatch({
+                temp.col = temp.col - as.numeric(as.Date(data[,columns[col]], origin = "1900-01-01"))
+              },
+              error=function(cond) {
+                temp.col = NULL
+              },
+              warning=function(cond) {
+                print(cond)
+              },
+              finally={})
+            }
+          }
+          if(!is.null(temp.col)){
+            count=1
+            while(paste0("date",count)%in%colnames(data)){
+              count = count+1
+            }
+            data <<- cbind(data,date.column.temp=round(temp.col,2))
+            colnames(data)[which(colnames(data)%in%"date.column.temp")] <<- paste0("date",count)
+            updateSelectInput(session=session,inputId="sel.compare.dates",selected="",choices=colnames(data))
+          }
+        }
+      })
+    }
+  })
+  
+  output$comp.dates.table = renderDataTable({
+    columns = input$sel.compare.dates[1:2]
+    ret = NULL
+    if(!is.null(data)){
+      ret = data[,test.for.dates()]
+      if(ncol(ret)==0){
+        ret = NULL
+      }
+      if(!is.null(columns)&&columns[1]!=""){
+        temp.col = NULL
+        for(col in 1:length(columns)){
+          if(col==1){
+            tryCatch({
+              temp.col = as.numeric(as.Date(data[,columns[col]], origin = "1900-01-01"))
+            },
+            error=function(cond) {
+              temp.col = NULL
+            },
+            warning=function(cond) {
+              print(cond)
+            },
+            finally={})
+          }else{
+            tryCatch({
+              temp.col = temp.col - as.numeric(as.Date(data[,columns[col]], origin = "1900-01-01"))
+            },
+            error=function(cond) {
+              temp.col = NULL
+            },
+            warning=function(cond) {
+              print(cond)
+            },
+            finally={})
+          }
+        }
+        if(!is.null(temp.col)){
+          ret = cbind(ret,temp.date=round(temp.col,2))
+        }
+      }
+    }
+    ret
+  },options=list(lengthMenu = c(5, 30, 50), pageLength = 5, columns.defaultContent="NA",scrollX=T))
+  
+  output$compare.dates = renderUI({
+    input$selector
+    compare.dates.panel()
   })
   
   ################################################################################
@@ -351,7 +453,7 @@ shinyServer(function(input, output, session) {
     input$add_column
     isolate({
       temp=data
-      if(!is.null(data)&&!is.null(input$new.column)){
+      if(!is.null(data)&&!is.null(input$new.column)&&input$add_column>0){
         colu = strsplit(input$new.column,"\n",fixed=T)[[1]]
         if(length(colu)==1){
           colu = strsplit(input$new.column,",",fixed=T)[[1]]
@@ -420,6 +522,48 @@ shinyServer(function(input, output, session) {
   
   output$add.columns = renderUI({
     add.columns.panel()
+  })
+  
+  ################################################################################
+  
+  ################################################################################
+  #
+  # modify -> remove columns : remove selected columns from the data.
+  #
+  ################################################################################
+  
+  observe({
+    input$rem_column
+    if(!is.null(data)&&!is.null(input$rem_column)&&input$rem_column>0){
+      isolate({
+        if(length(which(colnames(data)%in%input$select.remove.column))>0){
+          data <<- as.data.frame(data[,-which(colnames(data)%in%input$select.remove.column)])
+          if(ncol(data)==0){
+            data <<- NULL
+            updateSelectInput(session, inputId="select.remove.column",choices=c(""),selected="")
+          }else{
+            updateSelectInput(session, inputId="select.remove.column", choices=colnames(data),selected="")  
+          }
+        }
+      })
+    }
+  })
+  
+  output$rem.col.table = renderDataTable({
+    input$selector
+    temp = data
+    if(!is.null(data)&&!is.null(input$select.remove.column)){
+      temp = as.data.frame(data[,-which(colnames(data)%in%input$select.remove.column)])
+      if(ncol(temp)==0){
+        temp=NULL
+      }
+    }
+    temp
+  },options=list(lengthMenu = c(5, 30, 50), pageLength = 5, columns.defaultContent="NA",scrollX=T))
+  
+  output$remove.columns = renderUI({
+    input$selector
+    remove.columns.panel()
   })
   
   ################################################################################
