@@ -31,3 +31,5 @@ Main Files:
 	
 	ui.r -> The setup of the main gui. Images and navbar. Everything which does not change in the ui 
 	is defined here. 
+
+  VARS -> A file where variables can be set which are used as global variables in iNZight-Online

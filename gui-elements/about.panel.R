@@ -4,7 +4,7 @@ about.panel = function(){
            div(class="page-spacer",
                includeMarkdown('gui-elements/notes/about.intro.md'),
                HTML(paste("<center>",
-                          p(class="version",paste("iNZight-Online version:",as.character(2.0),sep=" ")),
+                          p(class="version",paste("iNZight-Online version:",as.character(version),sep=" ")),
                           "</center>",sep=" ")))
   ))
 }

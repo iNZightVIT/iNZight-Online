@@ -33,38 +33,44 @@ get.switch.data.main = function(has.input){
   if(is.null(data)){
     if(!has.input){
       list(div(class="page-divider"),
-           h1("No data selected!"),br(),
+           h3(textOutput("data_name_show")),
+           p(textOutput("row_dimension_show")),
+           p(textOutput("col_dimension_show")),
+           p(textOutput("col_names_show")),br(),
            div(class="page-divider"),
-           h1("No Data to select!"),br(),
+           h3(textOutput("set_to_change")),br(),
            dataTableOutput("temp_table"),
            div(class="page-divider"))
     }else{
       list(div(class="page-divider"),
-           h1("No data selected!"),br(),
+           h3(textOutput("data_name_show")),
+           p(textOutput("row_dimension_show")),
+           p(textOutput("col_dimension_show")),
+           p(textOutput("col_names_show")),br(),
            div(class="page-divider"),
-           h1("Data set to switch to"),br(),
+           h3(textOutput("set_to_change")),br(),
            dataTableOutput("temp_table"),
            div(class="page-divider"))
     }
   }else{
     if(!has.input){
       list(div(class="page-divider"),
-           h1(paste("Selected data set: ",data.name)),br(),
-           p(paste("Dimension rows: ",dim(data)[1],sep="")),#br(),
-           p(paste("Dimension columns: ",dim(data)[2],sep="")),
-           p(paste("Column names: ",paste(colnames(data),collapse=", "),sep="")),
+           h3(textOutput("data_name_show")),
+           p(textOutput("row_dimension_show")),
+           p(textOutput("col_dimension_show")),
+           p(textOutput("col_names_show")),br(),
            div(class="page-divider"),
-           h1("No Data to select!"),
+           h3(textOutput("set_to_change")),
            dataTableOutput("temp_table"),
            div(class="page-divider"))
     }else{
       list(div(class="page-divider"),
-           h1(paste("Selected data set: ",data.name)),br(),
-           p(paste("Dimension rows: ",dim(data)[1],sep="")),#br(),
-           p(paste("Dimension columns: ",dim(data)[2],sep="")),
-           p(paste("Column names: ",paste(colnames(data),collapse=", "),sep="")),
+           h3(textOutput("data_name_show")),
+           p(textOutput("row_dimension_show")),
+           p(textOutput("col_dimension_show")),
+           p(textOutput("col_names_show")),br(),
            div(class="page-divider"),
-           h1("Data set to switch to"),
+           h3(textOutput("set_to_change")),
            dataTableOutput("temp_table"),
            div(class="page-divider"))
     }

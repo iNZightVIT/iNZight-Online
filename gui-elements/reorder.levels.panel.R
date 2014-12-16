@@ -27,7 +27,7 @@ reorder.levels.panel =function(choices=c(),selected=""){
   }else{
     sidebarLayout(
       sidebarPanel(get.reorder.sidebar(choices)),
-      mainPanel(verbatimTextOutput("maintext.reorder"))
+      mainPanel(div(verbatimTextOutput("maintext.reorder")))
     )
   }
 }

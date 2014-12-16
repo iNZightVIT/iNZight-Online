@@ -345,8 +345,8 @@ abs.transform = function(data,names){
 }
 
 delete.old.files = function(days){
-  if(length(list.files("data/Imported"))>0){
-    unlink(list.files("data/Imported")[difftime(Sys.time(), file.info(list.files("data/Imported",full.name=T))[,"mtime"], units = "days")>days])
+  if(length(list.files(paste0(data.dir,"/Imported")))>0){
+    unlink(list.files(paste0(data.dir,"/Imported"))[difftime(Sys.time(), file.info(list.files(paste0(data.dir,"/Imported"),full.name=T))[,"mtime"], units = "days")>days])
   }
 }
 
@@ -374,7 +374,7 @@ inclMD <- function(file){
 # reads a data set from a filename in the data directory
 load.data = function(fileID=NULL,path=NULL){
   temp = NULL
-  full.name = list.files("data",full.names=T,recursive=T)
+  full.name = list.files(data.dir,full.names=T,recursive=T)
   if(!is.null(fileID)){
     if(is.null(path)){
       indexes = grep(paste(fileID,".",sep=""),full.name,fixed=T)
@@ -412,7 +412,7 @@ load.data = function(fileID=NULL,path=NULL){
 
 # returns directories in the data directory
 get.data.dirs = function(){
-  list.files("data",include.dirs=T,full.names=T)[file.info(paste("data",list.files("data"),sep="/"))[,"isdir"]]
+  list.files(data.dir,include.dirs=T,full.names=T)[file.info(paste(data.dir,list.files(data.dir),sep="/"))[,"isdir"]]
 }
 
 # returns a radioButton widget, for every filename in the dir.lable directory.
@@ -446,8 +446,50 @@ change.file.ext = function(name,new.ext){
   splity
 }
 
-# get the data, could also be NULL as the function returns NULL if called like that
+get.vars = function(){
+  lines = c()
+  if(file.exists("VARS")){
+    lines = scan("VARS",what="character",sep="\n",quiet=T)
+  }
+  if(length(lines)>0){
+    invisible(lapply(lines,function(line){
+      if(length(strsplit(line,"#")[[1]])>0){
+        line=strsplit(line,"#")[[1]][1]
+      }
+      if(!""%in%line){
+        variable = gsub("^\\s+|\\s+$", "", strsplit(line,"=")[[1]])
+        if(length(variable)!=2){
+          message(paste("Format of variable:",paste(variable,collapse=" "),"\n is not valid.",sep=" "))
+        }else{
+          if(variable[1]%in%vars&&!""%in%variable[2]){
+            if(variable[1]%in%"data.dir"){
+              data.dir<<-variable[2]
+            }else if(variable[1]%in%"version"){
+              version<<-variable[2]
+            }
+          }
+        }
+      }
+    }))
+  }
+}
 
+get.quantiles = function(subx){
+  g1 = rep("",length(subx))
+  if(is.numeric(subx)){
+    quant = quantile(subx,na.rm=T)
+    g1[which(subx>=quant[1]&subx<quant[2])] = paste(round(quant[1],2),round(quant[2],2),sep="-")
+    g1[which(subx>=quant[2]&subx<quant[3])] = paste(round(quant[2],2),round(quant[3],2),sep="-")
+    g1[which(subx>=quant[3]&subx<quant[4])] = paste(round(quant[3],2),round(quant[4],2),sep="-")
+    g1[which(subx>=quant[4]&subx<=quant[5])] = paste(round(quant[4],2),round(quant[5],2),sep="-")
+    g1 = as.factor(g1)
+  }
+  g1
+}
+
+vars = c("data.dir","version")
+data.dir = "data"
+version = "0.1.1"
 first.reorder=T
 transform.text = ""
 data = load.data()
@@ -455,5 +497,5 @@ data.name = data[[1]]
 data = data[[2]]
 temp.data=""
 loaded = F
-
+get.vars()
 

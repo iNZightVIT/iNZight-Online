@@ -1,3 +1,6 @@
+library(iNZightPlots)
+library(gpairs)
+
 shinyServer(function(input, output, session) {
 
   ################################################################################
@@ -24,6 +27,11 @@ shinyServer(function(input, output, session) {
   source("gui-elements/compare.dates.panel.R",local=T)
   source("gui-elements/add.columns.panel.R",local=T)
   source("gui-elements/remove.columns.panel.R",local=T)
+  source("gui-elements/quick.summary.panel.R",local=T)
+  source("gui-elements/single.column.plot.panel.R",local=T)
+  source("gui-elements/column.pair.plot.panel.R",local=T)
+  source("gui-elements/matrix.plot.panel.R",local=T)
+  source("gui-elements/advanced.graphics.panel.R",local=T)
   
   ################################################################################
   #
@@ -69,12 +77,79 @@ shinyServer(function(input, output, session) {
   #
   ################################################################################
   
-  #loads and updates the switch data table Panel
-  output$switch.data.panel = renderUI({
-    input$selector
-    if(!is.null(input$data_select)&!is.null(input$change_set)){
+  set_to_change_reac = reactive({
+    if(is.null(input[[input$data_select]])){
+      "No data to select!"
+    }else{
+      paste("Data selected: ",input[[input$data_select]],sep="")
+    }
+  })
+  
+  output$set_to_change = renderText({
+    input[[input$data_select]]
+    set_to_change_reac()
+  })
+  
+  col_names_show_reac = reactive({
+    input$change_set
+    if(!is.null(data)&&!is.null(data.name)){
+      paste("Column names: ",paste(colnames(data),collapse=", "))
+    }else{
+      ""
+    }
+  })
+  
+  output$col_names_show = renderText({
+    input$change_set
+    col_names_show_reac()
+  })
+  
+  change_col_dim_reac = reactive({
+    input$change_set
+    if(!is.null(data)&&!is.null(data.name)){
+      paste("Selected data number of columns is: ",dim(data)[2])
+    }else{
+      ""
+    }
+  })
+  
+  output$col_dimension_show = renderText({
+    input$change_set
+    change_col_dim_reac()
+  })
+  
+  change_row_dim_reac = reactive({
+    input$change_set
+    if(!is.null(data)&&!is.null(data.name)){
+      paste("Selected data number of rows is: ",dim(data)[1])
+    }else{
+      ""
+    }
+  })
+  
+  output$row_dimension_show = renderText({
+    input$change_set
+    change_row_dim_reac()
+  })
+  
+  change_data_name_reac = reactive({
+    input$change_set
+    if(!is.null(data)&&!is.null(data.name)){
+      paste("Selected data set: ",data.name)
+    }else{
+      "No data selected!"
+    }
+  })
+  
+  output$data_name_show = renderText({
+    input$change_set
+    change_data_name_reac()
+  })
+  
+  observe({
+    if(!is.null(input$change_set)){
       isolate({
-        if(input$change_set==1){
+        if(!is.null(input$data_select)&&input$change_set>0){
           new.data = load.data(strsplit(input[[input$data_select]],"==>",fixed=T)[[1]][length(strsplit(input[[input$data_select]],"==>",fixed=T)[[1]])])
           data.name <<- new.data[[1]]
           new.data = new.data[[2]]
@@ -83,6 +158,11 @@ shinyServer(function(input, output, session) {
         }
       })
     }
+  })
+  
+  #loads and updates the switch data table Panel
+  output$switch.data.panel = renderUI({
+    input$selector
     switch.data.panel(input$data_select)
   })
   
@@ -336,6 +416,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$reorder.levels =renderUI({
+    input$selector
     reorder.levels.panel()
   })
   
@@ -564,6 +645,317 @@ shinyServer(function(input, output, session) {
   output$remove.columns = renderUI({
     input$selector
     remove.columns.panel()
+  })
+  
+  ################################################################################
+  
+  ################################################################################
+  #
+  # Quick Explore -> Data summary : display a quick summary of the data
+  #
+  ################################################################################
+  
+  output$all.summary = renderPrint({
+    if(!is.null(data)){
+      for(col in 1:length(colnames(data))){
+        cat(colnames(data)[col],"\n")
+        print(summary(data[,col]))
+      }
+    }
+  })
+  
+  output$column.summary = renderPrint({
+    if(!is.null(input$select.column.sum)){
+      temp = data[,which(colnames(data)%in%input$select.column.sum)]
+      if(is.character(temp)){
+        print(as.factor(temp))
+        cat("\n\t")
+        print(summary(as.factor(temp)))
+      }else{
+        print(summary(temp))  
+      }
+    }else{
+      NULL
+    }
+  })
+  
+  output$quick.summary = renderUI({
+    input$selector
+    quick.summary.panel()
+  })
+  
+  ################################################################################
+  
+  ################################################################################
+  #
+  # Quick Explore -> Single column plot : Generate a plot of a single column in the data
+  #
+  ################################################################################
+  
+  output$column.plot = renderPlot({
+    if(!is.null(data)&&!is.null(input$select.column.plot)){
+      temp = data[,which(colnames(data)%in%input$select.column.plot)]
+      if(is.character(temp)){
+        temp = as.factor(temp)
+      }
+      iNZightPlot(temp,xlab=input$select.column.plot,main=data.name)
+    }
+  })
+  
+  output$single.column.plot = renderUI({
+    input$selector
+    single.column.plot.panel()
+  })
+  
+  ################################################################################
+  
+  ################################################################################
+  #
+  # Quick Explore -> Column pair plot : Generate a plot of all possible pairs of columns
+  #
+  ################################################################################
+  
+  observe({
+    input$select.column.plot1
+    choice = input$select.column.plot1
+    if(!is.null(choice)){
+      updateSelectInput(session,"select.column.plot2",choices=colnames(data)[-which(colnames(data)%in%choice)])
+    }
+  })
+  
+  output$plot.column.pair = renderPlot({
+    if(!is.null(input$select.column.plot1)&&!is.null(input$select.column.plot2)&&
+         !""%in%input$select.column.plot1&&!""%in%input$select.column.plot2){
+      x = data[,which(colnames(data)%in%input$select.column.plot1)]
+      y = data[,which(colnames(data)%in%input$select.column.plot2)]
+      iNZightPlot(x,y,xlab=input$select.column.plot1,ylab=input$select.column.plot2,main=data.name)
+    }
+  })
+  
+  output$column.pair.plot = renderUI({
+    input$selector
+    column.pair.plot.panel()
+  })
+  
+  ################################################################################
+  
+  ################################################################################
+  #
+  # Quick Explore -> Compare pairs : Generate plots of all possible pairs of columns
+  #
+  ################################################################################
+  
+  output$plot.matrix = renderPlot({
+    choices = input$select.matrix.plot
+    if(is.null(choices)||length(choices)==1){
+      plot(1,1,type="n",axes=FALSE,xlab="" ,ylab="")
+      text(1,1, "You have to select more than 1 variable", cex=2)
+    }else{
+      choices.ind = which(colnames(data)%in%choices)
+      temp = do.call(cbind,lapply(data[,choices.ind],function(x){if(is.character(x)){data.frame(factor(x,levels=unique(x)))}else{data.frame(x)}}))
+      colnames(temp) = choices
+      gpairs(temp)
+    }
+  })
+  
+  output$matrix.plot = renderUI({
+    input$selector
+    matrix.plot.panel()
+  })
+  
+  ################################################################################
+  
+  ################################################################################
+  #
+  # Advanced plot -> Graphics : Generate advanced plots
+  #
+  ################################################################################
+  
+  observe({
+    if(!is.null(input$subs1)&&!input$subs1%in%"none"){
+      isolate({
+        choices=c("All")
+        temp = data[,which(colnames(data)%in%input$subs1)]
+        if(is.numeric(temp)){
+          quant = quantile(temp,na.rm=T)
+          choices=c(choices,
+                    paste(round(quant[1],2),round(quant[2],2),sep="-"),
+                    paste(round(quant[2],2),round(quant[3],2),sep="-"),
+                    paste(round(quant[3],2),round(quant[4],2),sep="-"),
+                    paste(round(quant[4],2),round(quant[5],2),sep="-"))
+        }else{
+          if(is.character(temp)){
+            temp = as.factor(temp)
+          }
+          choices = c(choices,levels(temp))
+        }
+        updateSelectInput(session,"sub1_level",choices=choices)
+      })
+    }
+  })
+  
+  observe({
+    if(!is.null(input$subs2)&&!input$subs2%in%"none"){
+      isolate({
+        choices=c()
+        temp = data[,which(colnames(data)%in%input$subs2)]
+        if(is.numeric(temp)){
+          quant = quantile(temp,na.rm=T)
+          choices=c(choices,
+                    paste(round(quant[1],2),round(quant[2],2),sep="-"),
+                    paste(round(quant[2],2),round(quant[3],2),sep="-"),
+                    paste(round(quant[3],2),round(quant[4],2),sep="-"),
+                    paste(round(quant[4],2),round(quant[5],2),sep="-"))
+        }else{
+          if(is.character(temp)){
+            temp = as.factor(temp)
+          }
+          choices = c(choices,levels(temp))
+        }
+        updateSelectInput(session,"sub2_level",choices=choices)
+      })
+    }
+  })
+  
+  observe({
+    if(!is.null(input$reset.graphics)){
+      isolate({
+        updateSelectInput(session,"vari1",choices=colnames(data))
+        updateSelectInput(session,"subs1",choices=c("none",colnames(data)))
+        updateSelectInput(session,"vari2",choices=c("none",colnames(data)[-1]))
+        updateSelectInput(session,"subs2",choices=c("none",colnames(data)[-1]))
+        updateCheckboxInput(session,"add_plot",value=FALSE)
+      })
+    }
+  })
+  
+  observe({
+    if(!is.null(input$vari2)&&!input$vari2%in%"none"){
+      isolate({
+        updateSelectInput(session,"subs2",choices=c("none",colnames(data)[which(!colnames(data)%in%input$vari1)]))
+      })
+    }
+  })
+  
+  observe({
+    if(!is.null(input$vari1)){
+      updateSelectInput(session,"vari2",choices=c("none",colnames(data)[which(!colnames(data)%in%input$vari1)]))
+      updateSelectInput(session,"subs2",choices=c("none",colnames(data)[which(!colnames(data)%in%input$vari1)]))
+    }
+  })
+  
+  output$advanced.plot = renderPlot({
+    largesample = T
+    if(!is.null(input$graphics.style)&&input$graphics.style=="Large"){
+      largesample = F
+    }
+    if(!is.null(input$vari1)&&!is.null(input$vari2)&&input$vari2%in%"none"){ # first dropdownmenu (var1) but not second (var2)
+      varx = data[,which(colnames(data)%in%input$vari1)]
+      if(!is.numeric(varx)&!is.factor(varx)){
+        varx = as.factor(varx)
+      }
+      subx = data[,which(colnames(data)%in%input$subs1)]
+      if(!is.numeric(subx)&!is.factor(subx)&length(which(colnames(data)%in%input$subs1))>0){
+        subx = as.factor(subx)
+      }
+      if(!is.null(input$subs1)&&input$subs1%in%"none"){ # no subsetting of variable 1
+        iNZightPlot(x=varx,xlab=input$vari1,main="",largesample=largesample)
+      }else if(!is.null(input$subs1)){ # subsetting variable 1
+        g1 = rep("",length(subx))
+        if(is.numeric(subx)){
+          g1 = get.quantiles(subx)
+        }else if(is.character(subx)){
+          g1 = as.factor(subx)
+        }else if(is.factor(subx)){
+          g1 = subx
+        }else{
+          g1 = NULL
+        }
+        if(!is.null(input$sub1_level)&&input$sub1_level%in%"All"){ # subsetting of variable1 with all plots
+          iNZightPlot(x=varx,g1=g1,xlab=input$vari1,main="",largesample=largesample)
+        }else if(!is.null(input$sub1_level)){
+          iNZightPlot(x=varx,g1=g1,g1.level=input$sub1_level,xlab=input$vari1,main="",largesample=largesample) # subsetting of variable1 with single plots
+        }
+      }else{
+        NULL
+      }
+    }else if(!is.null(input$vari1)&&!is.null(input$vari2)&&!input$vari2%in%"none"){ # first and second dropdown menu
+      varx = data[,which(colnames(data)%in%input$vari1)]
+      if(!is.numeric(varx)&!is.factor(varx)){
+        varx = as.factor(varx)
+      }
+      subx = data[,which(colnames(data)%in%input$subs1)]
+      if(!is.numeric(subx)&!is.factor(subx)&length(which(colnames(data)%in%input$subs1))>0){
+        subx = as.factor(subx)
+      }
+      vary = data[,which(colnames(data)%in%input$vari2)]
+      if(!is.numeric(vary)&!is.factor(vary)){
+        varx = as.factor(varx)
+      }
+      suby = data[,which(colnames(data)%in%input$subs2)]
+      if(!is.numeric(suby)&!is.factor(suby)&length(which(colnames(data)%in%input$subs2))>0){
+        suby = as.factor(suby)
+      }
+      if((!is.null(input$subs1)&&input$subs1%in%"none"&&!is.null(input$subs2)&&input$subs2%in%"none")||
+           (!is.null(input$subs1)&&input$subs1%in%"none"&&!is.null(input$subs2))){ # no subsetting of variable 1 and variable 2 or subsetting variable 2 but not variable 1;
+        iNZightPlot(x=varx,y=vary,xlab=input$vari1,ylab=input$vari2,main="",largesample=largesample)
+      }else if(!is.null(input$subs1)&&!is.null(input$subs2)&&input$subs2%in%"none"){ # subsetting variable 1 but not variable 2;
+        g1 = rep("",length(subx))
+        if(is.numeric(subx)){
+          g1 = get.quantiles(subx)
+        }else if(is.character(subx)){
+          g1 = as.factor(subx)
+        }else if(is.factor(subx)){
+          g1 = subx
+        }else{
+          g1 = NULL
+        }
+        if(!is.null(input$sub1_level)&&input$sub1_level%in%"All"){ # subsetting of variable1 with all plots
+          iNZightPlot(x=varx,y=vary,g1=g1,xlab=input$vari1,ylab=input$vari2,main="",largesample=largesample)
+        }else if(!is.null(input$sub1_level)){ # subsetting with single plots
+          iNZightPlot(x=varx,y=vary,g1=g1,g1.level=input$sub1_level,xlab=input$vari1,ylab=input$vari2,main="",largesample=largesample) # subsetting of variable1 with single plots
+        }
+      }else if(!is.null(input$subs1)&&!is.null(input$subs2)){ #subsetting both
+        g1 = rep("",length(subx))
+        if(is.numeric(subx)){
+          g1 = get.quantiles(subx)
+        }else if(is.character(subx)){
+          g1 = as.factor(subx)
+        }else if(is.factor(subx)){
+          g1 = subx
+        }else{
+          g1 = NULL
+        }
+        g2 = rep("",length(suby))
+        if(is.numeric(suby)){
+          g2 = get.quantiles(suby)
+        }else if(is.character(suby)){
+          g2 = as.factor(suby)
+        }else if(is.factor(suby)){
+          g2 = suby
+        }else{
+          g2 = NULL
+        }
+        indices = 1:length(suby)
+        if(!is.null(input$sub2_level)){
+          indices = which(g2%in%input$sub2_level)
+        }
+        if(!is.null(input$sub1_level)&&input$sub1_level%in%"All"){ # subsetting of variable 1 with all plots
+          iNZightPlot(x=varx[indices],y=vary[indices],g1=g1[indices],xlab=input$vari1,ylab=input$vari2,main="",largesample=largesample)
+        }else if(!is.null(input$sub1_level)){ # subsetting with single plots
+          iNZightPlot(x=varx[indices],y=vary[indices],g1=g1[indices],g1.level=input$sub1_level,xlab=input$vari1,ylab=input$vari2,main="",largesample=largesample) # subsetting of variable1 with single plots
+        }
+      }else{
+        NULL
+      }
+    }else{
+      NULL
+    }
+  })
+  
+  output$advanced.graphics = renderUI({
+    input$selector
+    advanced.graphics.panel()
   })
   
   ################################################################################
