@@ -7,6 +7,8 @@ library(gpairs)
 library(devtools)
 library(iNZightRegression)
 
+options(shiny.deprecation.messages=FALSE)
+
 # Globally define a place where all users can share some reactive data. # not too much used in this case
 vars <- reactiveValues(users=NULL,actionCounter=0)
 
@@ -33,6 +35,7 @@ shinyServer(function(input, output, session) {
   source('tools/Model/menu.R', local = TRUE)
   source('tools/Model/modalTool.R', local = TRUE)
   source('tools/Model/model_observe.R', local = TRUE)
+  
   
   
   # source data & analysis tools

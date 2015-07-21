@@ -1,7 +1,8 @@
 library(shiny)
 
 shinyUI(
-  navbarPage(HTML("<a href='/futurelearn2014/'>iNZight online</a>"),
+  navbarPage(tags$head(tags$script("alert('Please Note, iNZight Online will soon be replaced by our new improved version iNZight Lite. Go to http://docker.stat.auckland.ac.nz/ to check out our beta version.')")),
+             HTML("<a href='/futurelearn2014/'>iNZight online</a>"),
              id = "nav_radiant", collapsable = TRUE,
              tabPanel("Data", uiOutput('data_ui_and_tabs')),
              tabPanel("Basic", uiOutput("basicdefine")),           
